@@ -214,6 +214,10 @@ const DashboardPage = () => {
 
               <button
                 type="button"
+                  onClick={() => {
+    setMenuOpen(false);
+    navigate("/pengajuan");
+  }}
                 className="rounded-lg px-3 py-2 text-left text-sm text-slate-600"
               >
                 Calonkan Diri
@@ -222,6 +226,7 @@ const DashboardPage = () => {
 
               <button
                 type="button"
+                  onClick={() => navigate("/voting")}
                 className="rounded-lg px-3 py-2 text-left text-sm text-slate-600"
               >
                 Voting
