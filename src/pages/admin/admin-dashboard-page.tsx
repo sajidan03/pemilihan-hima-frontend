@@ -40,6 +40,26 @@ type Pengajuan = {
 };
 
 
+// 20 Oktober 2026, jam 09:00 WIB
+const TARGET_DATE = new Date("2026-10-20T09:00:00+07:00").getTime();
+
+
+const getTimeLeft = () => {
+  const diff = Math.max(TARGET_DATE - Date.now(), 0);
+
+  return {
+    finished: diff === 0,
+    days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((diff / (1000 * 60)) % 60),
+    seconds: Math.floor((diff / 1000) % 60),
+  };
+};
+
+
+const pad = (value: number) => String(value).padStart(2, "0");
+
+
 const AdminDashboardPage = () => {
   const navigate = useNavigate();
 
@@ -48,12 +68,24 @@ const AdminDashboardPage = () => {
 
   const [pengajuan, setPengajuan] = useState<Pengajuan[]>([]);
 
+  const [timeLeft, setTimeLeft] = useState(getTimeLeft());
+
 
   const userRaw = localStorage.getItem("user");
 
   const user = userRaw
     ? JSON.parse(userRaw)
     : null;
+
+
+  // COUNTDOWN
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(getTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
 
   useEffect(() => {
@@ -114,6 +146,14 @@ const AdminDashboardPage = () => {
   const ditolak = pengajuan.filter(
     (item) => item.status === "ditolak"
   ).length;
+
+
+  const countdownItems = [
+    { label: "Hari", value: timeLeft.days },
+    { label: "Jam", value: timeLeft.hours },
+    { label: "Menit", value: timeLeft.minutes },
+    { label: "Detik", value: timeLeft.seconds },
+  ];
 
 
   return (
@@ -245,6 +285,56 @@ const AdminDashboardPage = () => {
 
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+        {/* COUNTDOWN */}
+        <section className="mb-6 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
+
+          <div className="text-center">
+
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#F6BF41]">
+              Hitung Mundur
+            </p>
+
+            <h3 className="mt-2 text-xl font-bold text-[#0A2C51] sm:text-2xl">
+
+              {timeLeft.finished
+                ? "Waktunya telah tiba!"
+                : "Menuju 20 Oktober 2026, Pukul 09.00 WIB"}
+
+            </h3>
+
+          </div>
+
+
+          <div className="mx-auto mt-6 grid max-w-2xl grid-cols-4 gap-3 sm:gap-4">
+
+            {countdownItems.map((item) => (
+
+              <div
+                key={item.label}
+                className="rounded-2xl bg-[#0A2C51] px-2 py-4 text-center sm:py-6"
+              >
+
+                <p className="text-2xl font-bold tabular-nums text-[#F6BF41] sm:text-4xl">
+
+                  {pad(item.value)}
+
+                </p>
+
+                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
+
+                  {item.label}
+
+                </p>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </section>
+
 
         {/* HERO */}
         <section className="overflow-hidden rounded-3xl bg-[#0A2C51] p-6 text-white sm:p-8 lg:p-10">
